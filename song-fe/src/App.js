@@ -11,6 +11,7 @@ function App() {
   const [selectedSong, setSelectedSong] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [executedQuery, setExecutedQuery] = useState('');
+  const [executionTime, setExecutionTime] = useState(0);
 
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
@@ -32,7 +33,7 @@ function App() {
   const handleSearch = async (e) => {
     e.preventDefault();
     if (!query.trim()) return;
-
+    setExecutionTime(null)
     setLoading(true);
     setMessage('');
 
@@ -62,8 +63,12 @@ function App() {
       console.log("Executing query:", queryText);
       setExecutedQuery(queryText);
 
+      const startTime = performance.now();
       const response = await fetch(endpoint);
       const data = await response.json();
+      const endTime = performance.now();
+      const executionTime = endTime - startTime;
+      setExecutionTime(executionTime);
       
       if (response.ok) {
         setResults(data);
@@ -175,6 +180,15 @@ DROP INDEX IF EXISTS idx_songs_artist_trgm;`;
     if (!text) return '';
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
+
+  const formatExecutionTime = (time) => {
+    if (time < 1000) {
+      return `${time.toFixed(2)} ms`;
+    } else {
+      return `${(time / 1000).toFixed(2)} s`;
+    }
+  };
+
   console.log(results)
   return (
     <div className="App">
@@ -285,6 +299,11 @@ DROP INDEX IF EXISTS idx_songs_artist_trgm;`;
           <div className="executed-query">
             <h3>SQL Query</h3>
             <pre>{executedQuery}</pre>
+            <div className="execution-time">
+              {executionTime !== null && (
+                <pre>Execution Time: {formatExecutionTime(executionTime)}</pre>
+              )}
+            </div>
           </div>
         )}
 

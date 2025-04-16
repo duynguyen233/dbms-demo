@@ -368,3 +368,13 @@ body {
     width: 95%;
   }
 }
+
+.execution-time {
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+
+.time-value {
+  font-weight: bold;
+  color: #2c62c4;
+}
